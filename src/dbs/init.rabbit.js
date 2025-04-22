@@ -37,7 +37,28 @@ const connectToRabbitMQForTest = async () => {
   }
 }
 
+const consumerQueue = async (channel , queueName) => {
+  try {
+    await channel.assertQueue(queueName, { durable: true });
+    console.log(`Waiting for messages in ${queueName}...`);
+
+    channel.consume(queueName, (msg) => {
+      console.log(`Received message: ${msg.content.toString()}`);
+      // 1. find User following that SHOP
+      // 2. send notification to that User
+      // 3. yes, ok ==> success
+      // 4. error, setup DLX.....
+    }, {
+      noAck: true // Acknowledge the message automatically ( if send then dont resend)
+    })
+  } catch (error) {
+    console.error('Error consuming from RabbitMQ:', error);
+    throw error
+  }
+}
+
 module.exports = {
   connectToRabbitMQ,
-  connectToRabbitMQForTest
+  connectToRabbitMQForTest,
+  consumerQueue
 };
